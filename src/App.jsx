@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 import { useEffect } from "react";
 import authService from "./appwrite/auth";
 import { useDispatch } from "react-redux";
-import { login, logout } from "./features/auth/authSlice";
+import { login, logout, setLoading } from "./features/auth/authSlice";
 import { fetchPinnedCities } from "./features/weather/pinnedCitiesSlice";
 import { setTheme } from "./features/mode/themeSlice";
 
@@ -26,6 +26,7 @@ function App() {
   }, [dispatch]);
 
   useEffect(() => {
+    dispatch(setLoading(true));
     authService.getCurrentUser().then((user) => {
       if (user) {
         dispatch(login(user));
