@@ -7,13 +7,13 @@ import SearchHistory from "./SearchHistory";
 import { useNavigate } from "react-router-dom";
 import PinCityButton from "./PinCityButton";
 
-function SearchBar({showPin=false}) {
+function SearchBar({ showPin = false }) {
   const { name, error } = useSelector((state) => state.weather);
 
   const userId = useSelector((state) => state.auth.userData?.$id);
 
   const userStatus = useSelector((state) => state.auth.status);
-  const navigate =useNavigate()
+  const navigate = useNavigate();
 
   const [city, setCity] = useState("");
   const [isFocused, setisFocused] = useState(false);
@@ -21,48 +21,51 @@ function SearchBar({showPin=false}) {
   const loading = useSelector((state) => state.weather.loadingWeather);
   const history = useSelector((state) => state.history.cities);
   // inside SearchBar
-const pinnedCities = useSelector((state) => state.pinnedCitiesList.pinnedCities || []);
+  const pinnedCities = useSelector(
+    (state) => state.pinnedCitiesList.pinnedCities || []
+  );
 
-// check if current weather city is already pinned
-const currentCityIsPinned = pinnedCities.some(
-  (row) => row.city?.toLowerCase().trim() === name?.toLowerCase().trim()
-);
+  // check if current weather city is already pinned
+  const currentCityIsPinned = pinnedCities.some(
+    (row) => row.city?.toLowerCase().trim() === name?.toLowerCase().trim()
+  );
 
   const handleSearch = useCallback(() => {
     if (!city.trim()) return;
     dispatch(clearWeather());
     dispatch(fetchWeather(city));
-  
-    if(userStatus){
-      navigate(`/search/${city}`)
+
+    if (userStatus) {
+      navigate(`/search/${city}`);
     }
 
     setisFocused(false);
-  }, [navigate,userStatus,city, dispatch]);
+  }, [navigate, userStatus, city, dispatch]);
 
   const handleSelectHistory = useCallback(
     (item) => {
       dispatch(clearWeather());
       dispatch(fetchWeather(item));
 
-      if(userStatus){
-        navigate(`/search/${item}`)
+      if (userStatus) {
+        navigate(`/search/${item}`);
       }
       setisFocused(false);
     },
-    [dispatch,navigate,userStatus]
+    [dispatch, navigate, userStatus]
   );
-
- 
 
   return (
     <>
-    <div className="w-full max-w-md mx-auto  my-6">
-
-      
+      <div className="w-full max-w-md mx-auto  my-6">
         <div className=" relative  flex justify-center items-center  gap-2 mx-4 ">
           <Input
             onChange={(e) => setCity(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch(); // same function you use for the Search button
+              }
+            }}
             type="search"
             value={city}
             placeholder={"Enter the city"}
@@ -80,8 +83,9 @@ const currentCityIsPinned = pinnedCities.some(
             Search
           </Button>
 
-          {showPin &&userStatus &&name && !error && !currentCityIsPinned && <PinCityButton city={name} userId={userId} />}
-         
+          {showPin && userStatus && name && !error && !currentCityIsPinned && (
+            <PinCityButton city={name} userId={userId} />
+          )}
 
           <div className="absolute top-full left-0 w-full  z-10">
             {isFocused && history.length > 0 && (
@@ -95,7 +99,7 @@ const currentCityIsPinned = pinnedCities.some(
             )}
           </div>
         </div>
-      </ div>
+      </div>
     </>
   );
 }
